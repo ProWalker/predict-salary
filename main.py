@@ -3,6 +3,7 @@ import os
 import requests
 
 from dotenv import load_dotenv
+from terminaltables import AsciiTable
 
 
 def hh_api_request(endpoint, params):
@@ -91,6 +92,27 @@ def get_vacancy_statistic(vacancy_objects, predict_salary_func):
     return statistic
 
 
+def create_table(title, vacancies_statistic):
+    table = []
+    table_headers = [
+        'Язык программирования',
+        'Вакансий найдено',
+        'Вакансий обработано',
+        'Средняя зарплата',
+    ]
+    table.append(table_headers)
+    for lang, statistic in vacancies_statistic.items():
+        table_row = [
+            lang,
+            statistic['vacancies_found'],
+            statistic['vacancies_processed'],
+            statistic['average_salary'],
+        ]
+        table.append(table_row)
+
+    return AsciiTable(table, title)
+
+
 def main():
     load_dotenv()
     superjob_api_key = os.getenv('SUPERJOB_API_KEY')
@@ -124,9 +146,6 @@ def main():
             hh_vacancies_statistic[language]['vacancies_processed'] = hh_vacancy_statistic['vacancies_processed']
             hh_vacancies_statistic[language]['average_salary'] = hh_vacancy_statistic['average_salary']
 
-    print('Статистика по hh:')
-    print(hh_vacancies_statistic)
-
     sj_params = {
         'town': 4,
         'catalogues': 48,
@@ -144,8 +163,11 @@ def main():
             sj_vacancies_statistic[language]['vacancies_processed'] = sj_vacancy_statistic['vacancies_processed']
             sj_vacancies_statistic[language]['average_salary'] = sj_vacancy_statistic['average_salary']
 
-    print('Статистика по SuperJob:')
-    print(sj_vacancies_statistic)
+    hh_table = create_table('HH Moscow', hh_vacancies_statistic)
+    sj_table = create_table('SuperJob Moscow', sj_vacancies_statistic)
+
+    print(hh_table.table)
+    print(sj_table.table)
 
 
 if __name__ == '__main__':
