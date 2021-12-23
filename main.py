@@ -74,40 +74,6 @@ def predict_rub_salary_sj(vacancy):
     return predict_salary(vacancy['payment_from'], vacancy['payment_to'])
 
 
-# def sj_vacancy_statistic(vacancy_response):
-#     vacancy_statistic = {}
-#     vacancies_processed = 0
-#     vacancy_rub_salaries = []
-#     for vacancy in vacancy_response['objects']:
-#         rub_salary = predict_rub_salary_sj(vacancy)
-#         if rub_salary is not None:
-#             vacancy_rub_salaries.append(rub_salary)
-#             vacancies_processed += 1
-#
-#     vacancy_rub_salaries.sort()
-#     mid_index = int(len(vacancy_rub_salaries) / 2)
-#     vacancy_statistic['vacancies_processed'] = vacancies_processed
-#     vacancy_statistic['average_salary'] = vacancy_rub_salaries[mid_index]
-#     return vacancy_statistic
-#
-#
-# def hh_vacancy_statistic(vacancy_response):
-#     vacancy_statistic = {}
-#     vacancies_processed = 0
-#     vacancy_rub_salaries = []
-#     for vacancy in vacancy_response['items']:
-#         rub_salary = predict_rub_salary_hh(vacancy)
-#         if rub_salary is not None:
-#             vacancy_rub_salaries.append(rub_salary)
-#             vacancies_processed += 1
-#
-#     vacancy_rub_salaries.sort()
-#     mid_index = int(len(vacancy_rub_salaries) / 2)
-#     vacancy_statistic['vacancies_processed'] = vacancies_processed
-#     vacancy_statistic['average_salary'] = vacancy_rub_salaries[mid_index]
-#     return vacancy_statistic
-
-
 def get_vacancy_statistic(vacancy_objects, predict_salary_func):
     statistic = {}
     vacancies_processed = 0
