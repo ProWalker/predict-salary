@@ -104,7 +104,7 @@ def get_vacancy_statistic(vacancy_objects, predict_salary_func):
             statistic['vacancy_salaries'].append(salary)
             statistic['vacancies_processed'] += 1
 
-    statistic['average_salary'] = sum(statistic['vacancy_salaries']) / statistic['vacancies_processed']
+    statistic['average_salary'] = sum(statistic['vacancy_salaries']) // statistic['vacancies_processed']
     return statistic
 
 
