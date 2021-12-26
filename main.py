@@ -23,9 +23,16 @@ def request_superjob_api(method_name, key, params=None):
     return response.json()
 
 
-def get_superjob_vacancies(key, params):
+def get_superjob_vacancies(key, search_text, town, catalogues):
     vacancies = []
-    params['page'] = 0
+    params = {
+        'town': town,
+        'catalogues': catalogues,
+        'keywords[0][srws]': 1,
+        'keywords[0][skwc]': 'and',
+        'keywords[0][keys]': search_text,
+        'page': 0,
+    }
     while True:
         page_response = request_superjob_api('vacancies', key, params)
         vacancies.extend(page_response['objects'])
@@ -37,10 +44,16 @@ def get_superjob_vacancies(key, params):
     return page_response
 
 
-def get_hh_vacancies(params):
+def get_hh_vacancies(search_text, search_field, area, only_with_salary):
     page_response = {}
     vacancies = []
-    params['page'] = 0
+    params = {
+        'text': search_text,
+        'search_field': search_field,
+        'area': area,
+        'only_with_salary': only_with_salary,
+        'page': 0,
+    }
     pages_number = 1
     while params['page'] < pages_number:
         page_response = request_hh_api('vacancies', params)
@@ -130,15 +143,8 @@ def main():
         'Go',
         'Objective-C',
     ]
-    hh_params = {
-        'text': '',
-        'search_field': 'name',
-        'area': 1,
-        'only_with_salary': True,
-    }
     for language in languages:
-        hh_params['text'] = f'Программист {language}'
-        hh_vacancies = get_hh_vacancies(hh_params)
+        hh_vacancies = get_hh_vacancies(f'Программист {language}', 'name', 1, True)
         if hh_vacancies['found'] > 100:
             hh_vacancy_statistic = get_vacancy_statistic(hh_vacancies['items'], predict_rub_salary_hh)
             hh_vacancies_statistic[language] = {}
@@ -146,16 +152,8 @@ def main():
             hh_vacancies_statistic[language]['vacancies_processed'] = hh_vacancy_statistic['vacancies_processed']
             hh_vacancies_statistic[language]['average_salary'] = hh_vacancy_statistic['average_salary']
 
-    sj_params = {
-        'town': 4,
-        'catalogues': 48,
-        'keywords[0][srws]': 1,
-        'keywords[0][skwc]': 'and',
-        'keywords[0][keys]': '',
-    }
     for language in languages:
-        sj_params['keywords[0][keys]'] = f'Программист {language}'
-        sj_vacancies = get_superjob_vacancies(superjob_api_key, params=sj_params)
+        sj_vacancies = get_superjob_vacancies(superjob_api_key, f'Программист {language}', 4, 48)
         if sj_vacancies['total'] > 0:
             sj_vacancy_statistic = get_vacancy_statistic(sj_vacancies['objects'], predict_rub_salary_sj)
             sj_vacancies_statistic[language] = {}
