@@ -12,7 +12,7 @@ At the moment script takes in account 10 programming languages:
 * Go
 * Objective-C
 
-Comparison takes place on two sites: HeadHunter and SuperJob.  
+Comparison takes place on two sites: [HeadHunter](https://hh.ru) and [SuperJob](https://superjob.ru).  
 Vacancies are listed in Moscow.  
 
 ### How to install
