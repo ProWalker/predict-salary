@@ -6,14 +6,14 @@ from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
 
-def hh_api_request(endpoint, params):
+def request_hh_api(endpoint, params):
     url = f'https://api.hh.ru/{endpoint}'
     response = requests.get(url, params=params)
     response.raise_for_status()
     return response.json()
 
 
-def superjob_api_request(method_name, key, params=None):
+def request_superjob_api(method_name, key, params=None):
     url = f'https://api.superjob.ru/2.0/{method_name}'
     headers = {
         'X-Api-App-Id': key
@@ -27,7 +27,7 @@ def get_superjob_vacancies(key, params):
     vacancies = []
     params['page'] = 0
     while True:
-        page_response = superjob_api_request('vacancies', key, params)
+        page_response = request_superjob_api('vacancies', key, params)
         vacancies.extend(page_response['objects'])
         if not page_response['more']:
             break
@@ -43,7 +43,7 @@ def get_hh_vacancies(params):
     params['page'] = 0
     pages_number = 1
     while params['page'] < pages_number:
-        page_response = hh_api_request('vacancies', params)
+        page_response = request_hh_api('vacancies', params)
         vacancies.extend(page_response['items'])
         pages_number = page_response['pages']
         params['page'] += 1
