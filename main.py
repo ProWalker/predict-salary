@@ -93,19 +93,18 @@ def predict_rub_salary_sj(vacancy):
 
 
 def get_vacancy_statistic(vacancy_objects, predict_salary_func):
-    statistic = {}
-    vacancies_processed = 0
-    vacancy_salaries = []
+    statistic = {
+        'vacancies_processed': 0,
+        'vacancy_salaries': [],
+        'average_salary': 0,
+    }
     for vacancy in vacancy_objects:
         salary = predict_salary_func(vacancy)
         if salary is not None:
-            vacancy_salaries.append(salary)
-            vacancies_processed += 1
+            statistic['vacancy_salaries'].append(salary)
+            statistic['vacancies_processed'] += 1
 
-    vacancy_salaries.sort()
-    mid_index = int(len(vacancy_salaries) / 2)
-    statistic['vacancies_processed'] = vacancies_processed
-    statistic['average_salary'] = vacancy_salaries[mid_index]
+    statistic['average_salary'] = sum(statistic['vacancy_salaries']) / statistic['vacancies_processed']
     return statistic
 
 
