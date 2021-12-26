@@ -4,6 +4,7 @@ import requests
 
 from dotenv import load_dotenv
 from terminaltables import AsciiTable
+from itertools import count
 
 
 def request_hh_api(endpoint, params):
@@ -24,45 +25,48 @@ def request_superjob_api(method_name, key, params=None):
 
 
 def get_superjob_vacancies(key, search_text, town, catalogues):
-    vacancies = []
-    params = {
-        'town': town,
-        'catalogues': catalogues,
-        'keywords[0][srws]': 1,
-        'keywords[0][skwc]': 'and',
-        'keywords[0][keys]': search_text,
-        'page': 0,
+    vacancies = {
+        'objects': [],
+        'total': 0,
     }
-    while True:
+    for page in count(0):
+        params = {
+            'town': town,
+            'catalogues': catalogues,
+            'keywords[0][srws]': 1,
+            'keywords[0][skwc]': 'and',
+            'keywords[0][keys]': search_text,
+            'page': page,
+        }
         page_response = request_superjob_api('vacancies', key, params)
-        vacancies.extend(page_response['objects'])
+        vacancies['objects'].extend(page_response['objects'])
+        vacancies['total'] = page_response['total']
         if not page_response['more']:
             break
-        params['page'] += 1
 
-    page_response['objects'] = vacancies
-    return page_response
+    return vacancies
 
 
 def get_hh_vacancies(search_text, search_field, area, only_with_salary):
-    page_response = {}
-    vacancies = []
-    params = {
-        'text': search_text,
-        'search_field': search_field,
-        'area': area,
-        'only_with_salary': only_with_salary,
-        'page': 0,
+    vacancies = {
+        'items': [],
+        'found': 0,
     }
-    pages_number = 1
-    while params['page'] < pages_number:
+    for page in count(0):
+        params = {
+            'text': search_text,
+            'search_field': search_field,
+            'area': area,
+            'only_with_salary': only_with_salary,
+            'page': page,
+        }
         page_response = request_hh_api('vacancies', params)
-        vacancies.extend(page_response['items'])
-        pages_number = page_response['pages']
-        params['page'] += 1
+        vacancies['items'].extend(page_response['items'])
+        vacancies['found'] = page_response['found']
+        if page >= page_response['pages']:
+            break
 
-    page_response['items'] = vacancies
-    return page_response
+    return vacancies
 
 
 def predict_salary(salary_from, salary_to):
