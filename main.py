@@ -150,19 +150,23 @@ def main():
         hh_vacancies = get_hh_vacancies(f'Программист {language}', 'name', 1, True)
         if hh_vacancies['found'] > 100:
             hh_vacancy_statistic = get_vacancy_statistic(hh_vacancies['items'], predict_rub_salary_hh)
-            hh_vacancies_statistic[language] = {}
-            hh_vacancies_statistic[language]['vacancies_found'] = hh_vacancies['found']
-            hh_vacancies_statistic[language]['vacancies_processed'] = hh_vacancy_statistic['vacancies_processed']
-            hh_vacancies_statistic[language]['average_salary'] = hh_vacancy_statistic['average_salary']
+            language_statistic = {
+                'vacancies_found': hh_vacancies['found'],
+                'vacancies_processed': hh_vacancy_statistic['vacancies_processed'],
+                'average_salary': hh_vacancy_statistic['average_salary'],
+            }
+            hh_vacancies_statistic[language] = language_statistic
 
     for language in languages:
         sj_vacancies = get_superjob_vacancies(superjob_api_key, f'Программист {language}', 4, 48)
         if sj_vacancies['total'] > 0:
             sj_vacancy_statistic = get_vacancy_statistic(sj_vacancies['objects'], predict_rub_salary_sj)
-            sj_vacancies_statistic[language] = {}
-            sj_vacancies_statistic[language]['vacancies_found'] = sj_vacancies['total']
-            sj_vacancies_statistic[language]['vacancies_processed'] = sj_vacancy_statistic['vacancies_processed']
-            sj_vacancies_statistic[language]['average_salary'] = sj_vacancy_statistic['average_salary']
+            language_statistic = {
+                'vacancies_found': sj_vacancies['total'],
+                'vacancies_processed': sj_vacancy_statistic['vacancies_processed'],
+                'average_salary': sj_vacancy_statistic['average_salary'],
+            }
+            sj_vacancies_statistic[language] = language_statistic
 
     hh_table = create_table('HH Moscow', hh_vacancies_statistic)
     sj_table = create_table('SuperJob Moscow', sj_vacancies_statistic)
