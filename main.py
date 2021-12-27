@@ -69,18 +69,18 @@ def get_hh_vacancies(search_text, search_field, area):
 
 
 def predict_salary(salary_from, salary_to):
-    if salary_from is None and salary_to is None:
+    if not salary_from and not salary_to:
         return None
-    if salary_from is None:
+    if not salary_from:
         return salary_to * 0.8
-    if salary_to is None:
+    if not salary_to:
         return salary_from * 1.2
     return (salary_from + salary_to) / 2
 
 
 def predict_rub_salary_hh(vacancy):
     salary = vacancy['salary']
-    if salary is None or salary['currency'] != 'RUR':
+    if not salary or salary['currency'] != 'RUR':
         return None
     return predict_salary(salary['from'], salary['to'])
 
