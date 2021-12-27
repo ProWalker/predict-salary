@@ -47,7 +47,7 @@ def get_superjob_vacancies(key, search_text, town, catalogues):
     return vacancies
 
 
-def get_hh_vacancies(search_text, search_field, area, only_with_salary):
+def get_hh_vacancies(search_text, search_field, area):
     vacancies = {
         'items': [],
         'found': 0,
@@ -57,7 +57,6 @@ def get_hh_vacancies(search_text, search_field, area, only_with_salary):
             'text': search_text,
             'search_field': search_field,
             'area': area,
-            'only_with_salary': only_with_salary,
             'page': page,
         }
         page_response = request_hh_api('vacancies', params)
@@ -149,7 +148,7 @@ def main():
         'Objective-C',
     ]
     for language in languages:
-        hh_vacancies = get_hh_vacancies(f'Программист {language}', 'name', 1, False)
+        hh_vacancies = get_hh_vacancies(f'Программист {language}', 'name', 1)
         hh_vacancy_statistic = get_vacancy_statistic(hh_vacancies['items'], predict_rub_salary_hh)
         language_statistic = {
             'vacancies_found': hh_vacancies['found'],
