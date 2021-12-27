@@ -81,7 +81,7 @@ def predict_salary(salary_from, salary_to):
 
 def predict_rub_salary_hh(vacancy):
     salary = vacancy['salary']
-    if salary['currency'] != 'RUR':
+    if salary is None or salary['currency'] != 'RUR':
         return None
     return predict_salary(salary['from'], salary['to'])
 
@@ -149,7 +149,7 @@ def main():
         'Objective-C',
     ]
     for language in languages:
-        hh_vacancies = get_hh_vacancies(f'Программист {language}', 'name', 1, True)
+        hh_vacancies = get_hh_vacancies(f'Программист {language}', 'name', 1, False)
         hh_vacancy_statistic = get_vacancy_statistic(hh_vacancies['items'], predict_rub_salary_hh)
         language_statistic = {
             'vacancies_found': hh_vacancies['found'],
