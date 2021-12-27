@@ -133,6 +133,15 @@ def create_table(title, vacancies_statistic):
 def main():
     load_dotenv()
     superjob_api_key = os.getenv('SUPERJOB_API_KEY')
+    hh_areas = {
+        'Moscow': 1,
+    }
+    sj_areas = {
+        'Moscow': 4,
+    }
+    sj_industries = {
+        'Development, programming': 48,
+    }
     hh_vacancies_statistic = {}
     sj_vacancies_statistic = {}
     languages = [
@@ -148,7 +157,11 @@ def main():
         'Objective-C',
     ]
     for language in languages:
-        hh_vacancies = get_hh_vacancies(f'Программист {language}', 'name', 1)
+        hh_vacancies = get_hh_vacancies(
+            f'Программист {language}',
+            'name',
+            hh_areas['Moscow']
+        )
         hh_vacancy_statistic = get_vacancy_statistic(hh_vacancies['items'], predict_rub_salary_hh)
         language_statistic = {
             'vacancies_found': hh_vacancies['found'],
@@ -158,7 +171,12 @@ def main():
         hh_vacancies_statistic[language] = language_statistic
 
     for language in languages:
-        sj_vacancies = get_superjob_vacancies(superjob_api_key, f'Программист {language}', 4, 48)
+        sj_vacancies = get_superjob_vacancies(
+            superjob_api_key,
+            f'Программист {language}',
+            sj_areas['Moscow'],
+            sj_industries['Development, programming']
+        )
         sj_vacancy_statistic = get_vacancy_statistic(sj_vacancies['objects'], predict_rub_salary_sj)
         language_statistic = {
             'vacancies_found': sj_vacancies['total'],
