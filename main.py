@@ -14,17 +14,17 @@ def request_hh_api(endpoint, params):
     return response.json()
 
 
-def request_superjob_api(method_name, key, params=None):
+def request_superjob_api(method_name, api_key, params=None):
     url = f'https://api.superjob.ru/2.0/{method_name}'
     headers = {
-        'X-Api-App-Id': key
+        'X-Api-App-Id': api_key
     }
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     return response.json()
 
 
-def get_superjob_vacancies(key, search_text, town, catalogues):
+def get_superjob_vacancies(api_key, search_text, town, catalogues):
     vacancies = {
         'objects': [],
         'total': 0,
@@ -38,7 +38,7 @@ def get_superjob_vacancies(key, search_text, town, catalogues):
             'keywords[0][keys]': search_text,
             'page': page,
         }
-        page_response = request_superjob_api('vacancies', key, params)
+        page_response = request_superjob_api('vacancies', api_key, params)
         vacancies['objects'].extend(page_response['objects'])
         vacancies['total'] = page_response['total']
         if not page_response['more']:
