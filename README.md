@@ -3,6 +3,7 @@
 Script for comparing salaries of vacancies by programming language.  
 At the moment script takes in account 10 programming languages:  
 * Javascript
+* Java
 * Python
 * Ruby
 * PHP
@@ -21,7 +22,7 @@ Vacancies are listed in Moscow.
 
 Create file .env in script root folder.  
 In .env file create the environment variable SUPERJOB_API_KEY.  
-Register your app in SuperJob site [here](https://api.superjob.ru/)  
+Register your app in SuperJob site [here](https://api.superjob.ru/).  
 After you get API key, assign it to the environment variable SUPERJOB_API_KEY.  
 
 ### Project Goals
