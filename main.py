@@ -105,6 +105,37 @@ def get_vacancy_statistic(vacancy_objects, predict_salary_func):
     return vacancies_processed, average_salary
 
 
+def get_hh_language_statistic(language, area):
+    hh_vacancies_items, hh_vacancies_found = get_hh_vacancies(
+        f'Программист {language}',
+        'name',
+        area
+    )
+    hh_vacancies_processed, hh_average_salary = get_vacancy_statistic(hh_vacancies_items, predict_rub_salary_hh)
+    language_statistic = {
+        'vacancies_found': hh_vacancies_found,
+        'vacancies_processed': hh_vacancies_processed,
+        'average_salary': hh_average_salary,
+    }
+    return language_statistic
+
+
+def get_sj_language_statistic(language, area, industry, api_key):
+    sj_vacancies_objects, sj_vacancies_total = get_superjob_vacancies(
+        api_key,
+        f'Программист {language}',
+        area,
+        industry
+    )
+    sj_vacancies_processed, sj_average_salary = get_vacancy_statistic(sj_vacancies_objects, predict_rub_salary_sj)
+    language_statistic = {
+        'vacancies_found': sj_vacancies_total,
+        'vacancies_processed': sj_vacancies_processed,
+        'average_salary': sj_average_salary,
+    }
+    return language_statistic
+
+
 def create_table(title, vacancies_statistic):
     table = []
     table_headers = [
@@ -153,33 +184,16 @@ def main():
         'Objective-C',
     ]
     for language in languages:
-        hh_vacancies_items, hh_vacancies_found = get_hh_vacancies(
-            f'Программист {language}',
-            'name',
+        hh_vacancies_statistic[language] = get_hh_language_statistic(
+            language,
             hh_areas['Moscow']
         )
-        hh_vacancies_processed, hh_average_salary = get_vacancy_statistic(hh_vacancies_items, predict_rub_salary_hh)
-        language_statistic = {
-            'vacancies_found': hh_vacancies_found,
-            'vacancies_processed': hh_vacancies_processed,
-            'average_salary': hh_average_salary,
-        }
-        hh_vacancies_statistic[language] = language_statistic
-
-    for language in languages:
-        sj_vacancies_objects, sj_vacancies_total = get_superjob_vacancies(
-            superjob_api_key,
-            f'Программист {language}',
+        sj_vacancies_statistic[language] = get_sj_language_statistic(
+            language,
             sj_areas['Moscow'],
-            sj_industries['Development, programming']
+            sj_industries['Development, programming'],
+            superjob_api_key
         )
-        sj_vacancies_processed, sj_average_salary = get_vacancy_statistic(sj_vacancies_objects, predict_rub_salary_sj)
-        language_statistic = {
-            'vacancies_found': sj_vacancies_total,
-            'vacancies_processed': sj_vacancies_processed,
-            'average_salary': sj_average_salary,
-        }
-        sj_vacancies_statistic[language] = language_statistic
 
     hh_table = create_table('HH Moscow', hh_vacancies_statistic)
     sj_table = create_table('SuperJob Moscow', sj_vacancies_statistic)
