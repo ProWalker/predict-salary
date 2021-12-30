@@ -99,7 +99,7 @@ def get_vacancy_statistic(vacancy_objects, predict_salary_func):
             vacancy_salaries.append(salary)
             vacancies_processed += 1
 
-    if vacancies_processed > 0:
+    if vacancies_processed:
         average_salary = sum(vacancy_salaries) // vacancies_processed
 
     return vacancies_processed, average_salary
