@@ -25,10 +25,8 @@ def request_superjob_api(method_name, api_key, params=None):
 
 
 def get_superjob_vacancies(api_key, search_text, town, catalogues):
-    vacancies = {
-        'objects': [],
-        'total': 0,
-    }
+    vacancies_objects = []
+    vacancies_total = 0
     params = {
         'town': town,
         'catalogues': catalogues,
@@ -40,19 +38,17 @@ def get_superjob_vacancies(api_key, search_text, town, catalogues):
     for page in count(0):
         params['page'] = page
         page_response = request_superjob_api('vacancies', api_key, params)
-        vacancies['objects'].extend(page_response['objects'])
-        vacancies['total'] = page_response['total']
+        vacancies_objects.extend(page_response['objects'])
+        vacancies_total = page_response['total']
         if not page_response['more']:
             break
 
-    return vacancies
+    return vacancies_objects, vacancies_total
 
 
 def get_hh_vacancies(search_text, search_field, area):
-    vacancies = {
-        'items': [],
-        'found': 0,
-    }
+    vacancies_items = []
+    vacancies_found = 0
     params = {
         'text': search_text,
         'search_field': search_field,
@@ -62,12 +58,12 @@ def get_hh_vacancies(search_text, search_field, area):
     for page in count(0):
         params['page'] = page
         page_response = request_hh_api('vacancies', params)
-        vacancies['items'].extend(page_response['items'])
-        vacancies['found'] = page_response['found']
+        vacancies_items.extend(page_response['items'])
+        vacancies_found = page_response['found']
         if page >= page_response['pages']:
             break
 
-    return vacancies
+    return vacancies_items, vacancies_found
 
 
 def predict_salary(salary_from, salary_to):
@@ -94,21 +90,19 @@ def predict_rub_salary_sj(vacancy):
 
 
 def get_vacancy_statistic(vacancy_objects, predict_salary_func):
-    statistic = {
-        'vacancies_processed': 0,
-        'vacancy_salaries': [],
-        'average_salary': 0,
-    }
+    vacancies_processed = 0
+    vacancy_salaries = []
+    average_salary = 0
     for vacancy in vacancy_objects:
         salary = predict_salary_func(vacancy)
         if salary is not None:
-            statistic['vacancy_salaries'].append(salary)
-            statistic['vacancies_processed'] += 1
+            vacancy_salaries.append(salary)
+            vacancies_processed += 1
 
-    if statistic['vacancies_processed'] > 0:
-        statistic['average_salary'] = sum(statistic['vacancy_salaries']) // statistic['vacancies_processed']
+    if vacancies_processed > 0:
+        average_salary = sum(vacancy_salaries) // vacancies_processed
 
-    return statistic
+    return vacancies_processed, average_salary
 
 
 def create_table(title, vacancies_statistic):
@@ -159,31 +153,31 @@ def main():
         'Objective-C',
     ]
     for language in languages:
-        hh_vacancies = get_hh_vacancies(
+        hh_vacancies_items, hh_vacancies_found = get_hh_vacancies(
             f'Программист {language}',
             'name',
             hh_areas['Moscow']
         )
-        hh_vacancy_statistic = get_vacancy_statistic(hh_vacancies['items'], predict_rub_salary_hh)
+        hh_vacancies_processed, hh_average_salary = get_vacancy_statistic(hh_vacancies_items, predict_rub_salary_hh)
         language_statistic = {
-            'vacancies_found': hh_vacancies['found'],
-            'vacancies_processed': hh_vacancy_statistic['vacancies_processed'],
-            'average_salary': hh_vacancy_statistic['average_salary'],
+            'vacancies_found': hh_vacancies_found,
+            'vacancies_processed': hh_vacancies_processed,
+            'average_salary': hh_average_salary,
         }
         hh_vacancies_statistic[language] = language_statistic
 
     for language in languages:
-        sj_vacancies = get_superjob_vacancies(
+        sj_vacancies_objects, sj_vacancies_total = get_superjob_vacancies(
             superjob_api_key,
             f'Программист {language}',
             sj_areas['Moscow'],
             sj_industries['Development, programming']
         )
-        sj_vacancy_statistic = get_vacancy_statistic(sj_vacancies['objects'], predict_rub_salary_sj)
+        sj_vacancies_processed, sj_average_salary = get_vacancy_statistic(sj_vacancies_objects, predict_rub_salary_sj)
         language_statistic = {
-            'vacancies_found': sj_vacancies['total'],
-            'vacancies_processed': sj_vacancy_statistic['vacancies_processed'],
-            'average_salary': sj_vacancy_statistic['average_salary'],
+            'vacancies_found': sj_vacancies_total,
+            'vacancies_processed': sj_vacancies_processed,
+            'average_salary': sj_average_salary,
         }
         sj_vacancies_statistic[language] = language_statistic
 
