@@ -29,15 +29,16 @@ def get_superjob_vacancies(api_key, search_text, town, catalogues):
         'objects': [],
         'total': 0,
     }
+    params = {
+        'town': town,
+        'catalogues': catalogues,
+        'keywords[0][srws]': 1,
+        'keywords[0][skwc]': 'and',
+        'keywords[0][keys]': search_text,
+        'page': 0,
+    }
     for page in count(0):
-        params = {
-            'town': town,
-            'catalogues': catalogues,
-            'keywords[0][srws]': 1,
-            'keywords[0][skwc]': 'and',
-            'keywords[0][keys]': search_text,
-            'page': page,
-        }
+        params['page'] = page
         page_response = request_superjob_api('vacancies', api_key, params)
         vacancies['objects'].extend(page_response['objects'])
         vacancies['total'] = page_response['total']
@@ -52,13 +53,14 @@ def get_hh_vacancies(search_text, search_field, area):
         'items': [],
         'found': 0,
     }
+    params = {
+        'text': search_text,
+        'search_field': search_field,
+        'area': area,
+        'page': 0,
+    }
     for page in count(0):
-        params = {
-            'text': search_text,
-            'search_field': search_field,
-            'area': area,
-            'page': page,
-        }
+        params['page'] = page
         page_response = request_hh_api('vacancies', params)
         vacancies['items'].extend(page_response['items'])
         vacancies['found'] = page_response['found']
