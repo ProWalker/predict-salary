@@ -95,7 +95,7 @@ def get_vacancy_statistic(vacancy_objects, predict_salary_func):
     average_salary = 0
     for vacancy in vacancy_objects:
         salary = predict_salary_func(vacancy)
-        if salary is not None:
+        if salary:
             vacancy_salaries.append(salary)
             vacancies_processed += 1
 
