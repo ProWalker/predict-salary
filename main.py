@@ -25,7 +25,7 @@ def request_superjob_api(method_name, api_key, params=None):
 
 
 def get_superjob_vacancies(api_key, search_text, town, catalogues):
-    vacancies_objects = []
+    vacancies = []
     vacancies_total = 0
     params = {
         'town': town,
@@ -38,16 +38,16 @@ def get_superjob_vacancies(api_key, search_text, town, catalogues):
     for page in count(0):
         params['page'] = page
         page_response = request_superjob_api('vacancies', api_key, params)
-        vacancies_objects.extend(page_response['objects'])
+        vacancies.extend(page_response['objects'])
         vacancies_total = page_response['total']
         if not page_response['more']:
             break
 
-    return vacancies_objects, vacancies_total
+    return vacancies, vacancies_total
 
 
 def get_hh_vacancies(search_text, search_field, area):
-    vacancies_items = []
+    vacancies = []
     vacancies_found = 0
     params = {
         'text': search_text,
@@ -58,12 +58,12 @@ def get_hh_vacancies(search_text, search_field, area):
     for page in count(0):
         params['page'] = page
         page_response = request_hh_api('vacancies', params)
-        vacancies_items.extend(page_response['items'])
+        vacancies.extend(page_response['items'])
         vacancies_found = page_response['found']
         if page >= page_response['pages']:
             break
 
-    return vacancies_items, vacancies_found
+    return vacancies, vacancies_found
 
 
 def predict_salary(salary_from, salary_to):
@@ -89,11 +89,11 @@ def predict_rub_salary_sj(vacancy):
     return predict_salary(vacancy['payment_from'], vacancy['payment_to'])
 
 
-def get_vacancy_statistic(vacancy_objects, predict_salary_func):
+def get_vacancy_statistic(vacancies, predict_salary_func):
     vacancies_processed = 0
     vacancy_salaries = []
     average_salary = 0
-    for vacancy in vacancy_objects:
+    for vacancy in vacancies:
         salary = predict_salary_func(vacancy)
         if salary:
             vacancy_salaries.append(salary)
@@ -106,12 +106,12 @@ def get_vacancy_statistic(vacancy_objects, predict_salary_func):
 
 
 def get_hh_language_statistic(language, area):
-    hh_vacancies_items, hh_vacancies_found = get_hh_vacancies(
+    hh_vacancies, hh_vacancies_found = get_hh_vacancies(
         f'Программист {language}',
         'name',
         area
     )
-    hh_vacancies_processed, hh_average_salary = get_vacancy_statistic(hh_vacancies_items, predict_rub_salary_hh)
+    hh_vacancies_processed, hh_average_salary = get_vacancy_statistic(hh_vacancies, predict_rub_salary_hh)
     language_statistic = {
         'vacancies_found': hh_vacancies_found,
         'vacancies_processed': hh_vacancies_processed,
@@ -121,13 +121,13 @@ def get_hh_language_statistic(language, area):
 
 
 def get_sj_language_statistic(language, area, industry, api_key):
-    sj_vacancies_objects, sj_vacancies_total = get_superjob_vacancies(
+    sj_vacancies, sj_vacancies_total = get_superjob_vacancies(
         api_key,
         f'Программист {language}',
         area,
         industry
     )
-    sj_vacancies_processed, sj_average_salary = get_vacancy_statistic(sj_vacancies_objects, predict_rub_salary_sj)
+    sj_vacancies_processed, sj_average_salary = get_vacancy_statistic(sj_vacancies, predict_rub_salary_sj)
     language_statistic = {
         'vacancies_found': sj_vacancies_total,
         'vacancies_processed': sj_vacancies_processed,
