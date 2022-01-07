@@ -33,7 +33,6 @@ def get_superjob_vacancies(api_key, search_text, town, catalogues):
         'keywords[0][srws]': 1,
         'keywords[0][skwc]': 'and',
         'keywords[0][keys]': search_text,
-        'page': 0,
     }
     for page in count(0):
         params['page'] = page
@@ -53,7 +52,6 @@ def get_hh_vacancies(search_text, search_field, area):
         'text': search_text,
         'search_field': search_field,
         'area': area,
-        'page': 0,
     }
     for page in count(0):
         params['page'] = page
